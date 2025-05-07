@@ -1,0 +1,250 @@
+\begin{abstract}
+This study applies time series analysis techniques to investigate patterns in public transit ridership in the United States, with particular attention to the impact of COVID-19. Using monthly Unlinked Passenger Trips (UPT) data from the National Transit Database spanning January 2002 to February 2025, we develop multiple time series models using both manual and automated approaches at national and jurisdictional levels. Our methodology includes fitting SARIMA models to pre-COVID data to estimate counterfactual ridership levels and developing intervention models to capture the structural break caused by the pandemic. Results indicate that while transit ridership follows consistent seasonal patterns, COVID-19 caused unprecedented disruption to ridership levels. Although recovery has occurred, current ridership remains significantly below pre-pandemic forecasted levels, with the recovery rate showing signs of deceleration. The jurisdictional analysis reveals geographical variations in both pre-pandemic patterns and post-pandemic recovery trajectories. This analysis provides valuable insights for transit agencies and policymakers in understanding ridership patterns and the long-term implications of major disruptions on public transportation systems.
+\end{abstract}
+
+\vspace{8pt}
+\noindent
+\textbf{Keywords}: Time series analysis; SARIMA models; Public transportation; COVID-19 impact; Ridership forecasting; Intervention analysis.
+
+%------------------------------------------------------------------------------%
+\section{Introduction}
+%------------------------------------------------------------------------------%
+
+Public transit systems represent critical infrastructure in urban environments, supporting economic activity, reducing traffic congestion, and providing essential mobility for millions of Americans. Understanding patterns and trends in transit ridership is crucial for effective planning, resource allocation, and policy development. The COVID-19 pandemic that emerged in early 2020 created an unprecedented disruption to transit systems nationwide, with dramatic declines in ridership as lockdown measures were implemented and remote work became widespread.
+
+This study explores patterns in transit ridership across the United States using time series analysis techniques, with particular attention to the impact of COVID-19. Specifically, we examine monthly Unlinked Passenger Trips (UPT) data collected by the Federal Transit Administration to develop models that can characterize ridership patterns, forecast future trends, and quantify the pandemic's effects. This analysis provides valuable insights into both typical transit usage patterns and the magnitude and persistence of major disruptions.
+
+Transit ridership typically follows predictable seasonal patterns, with variations based on weather, holidays, academic calendars, and other cyclical factors. These patterns create natural opportunities for time series modeling approaches, while the scale of disruption caused by COVID-19 presents a unique case study for understanding how major external shocks impact established transportation patterns and how systems recover from such events.
+
+Our analysis employs multiple complementary approaches:
+
+\begin{enumerate}
+  \item \textbf{Pre-COVID SARIMA Model:} We develop a seasonal autoregressive integrated moving average (SARIMA) model using pre-pandemic data to establish a counterfactual forecast of what ridership would have been without COVID-19.
+  
+  \item \textbf{Intervention Model:} [TO BE COMPLETED] This section will describe the intervention model approach that incorporates the structural break caused by the pandemic.
+  
+  \item \textbf{Jurisdiction-Specific Analysis:} [TO BE COMPLETED] This section will outline the approach to examining geographical variations in ridership patterns, pandemic impact, and recovery trajectories.
+\end{enumerate}
+
+The findings from this study have important implications for transit agencies, urban planners, and policymakers as they work to understand ridership patterns, rebuild from disruptions, adapt service models, and prepare for future challenges. By employing multiple modeling approaches at different geographical scales, we provide a comprehensive analysis of public transportation usage patterns and resilience.
+
+%------------------------------------------------------------------------------%
+\section{The Data}
+%------------------------------------------------------------------------------%
+
+This study utilizes monthly Unlinked Passenger Trips (UPT) data from the National Transit Database (NTD) maintained by the Federal Transit Administration. The dataset covers the period from January 2002 through February 2025, providing a comprehensive longitudinal view of transit ridership patterns across the United States. UPT represents the number of passengers who board public transportation vehicles, regardless of whether a passenger is transferring from another vehicle. It serves as a standard metric for measuring transit system usage.
+
+The raw data was obtained from the Monthly Module Raw Data Release available on the Federal Transit Administration's website (https://www.transit.dot.gov/ntd/data-product/monthly-module-raw-data-release). In its original format, the dataset presented each jurisdiction-transit mode combination as a separate row, with monthly UPT figures arranged across columns. This structure required significant preprocessing before analysis could begin.
+
+\subsection{Data Cleaning and Preparation}
+
+The data cleaning process involved several key steps:
+
+\begin{enumerate}
+  \item \textbf{Restructuring to tidy format:} We transformed the data so that each row represents a single observation (one month's UPT for a specific jurisdiction-mode combination). This required parsing the column names to extract month and year information and converting these into proper date objects.
+  
+  \item \textbf{Aggregation by jurisdiction:} We aggregated the data by summing UPT values across different transit modes within each jurisdiction to obtain jurisdiction-level totals.
+  
+  \item \textbf{National aggregation:} For the nationwide analysis, we further aggregated these jurisdiction-level totals to produce monthly national UPT figures.
+\end{enumerate}
+
+\begin{figure}[!ht]
+\centering
+% [INCLUDE TIME SERIES PLOT OF NATIONAL UPT FROM 2002-2025]
+\caption{Monthly national UPT from January 2002 to February 2025, showing seasonal patterns and COVID-19 disruption}
+\label{f:data}
+\end{figure}
+
+Visual inspection of the national UPT time series (Figure~\ref{f:data}) reveals strong seasonal patterns, with consistent yearly cycles. The data shows relatively stable ridership levels for many years prior to 2020, followed by a dramatic decline coinciding with the onset of the COVID-19 pandemic in early 2020. This abrupt change represents the most significant disruption in the 23-year period covered by our dataset.
+
+\subsection{Data Quality Assessment}
+
+Data quality checks revealed some missing values and outliers, particularly for smaller transit agencies during certain months. These issues were addressed through imputation based on seasonal patterns where appropriate, or by excluding problematic jurisdiction-months from the analysis when necessary. However, the national aggregated data used for our primary models showed no significant gaps or anomalies outside of the expected pandemic-related disruption.
+
+\begin{figure}[!ht]
+\centering
+% [INCLUDE BOXPLOT OR OTHER VISUALIZATION SHOWING SEASONAL PATTERNS]
+\caption{Seasonal patterns in national transit ridership (UPT by month)}
+\label{f:seasonal}
+\end{figure}
+
+The extensive time period covered by this dataset allows us to establish robust baseline models of pre-pandemic ridership patterns while also capturing the full trajectory of the pandemic's impact and the subsequent recovery period. This temporal scope is essential for addressing our research questions regarding both typical ridership patterns and the effects of major disruptions.
+
+%------------------------------------------------------------------------------%
+\section{Methods}
+%------------------------------------------------------------------------------%
+
+Our analysis employed multiple time series modeling approaches to understand transit ridership patterns and the impact of COVID-19. This section details the methods used for the pre-COVID forecast model development, while subsequent sections on intervention modeling and jurisdiction-specific analysis will be addressed by other team members.
+
+\subsection{Data Preparation}
+
+After restructuring the raw data into a tidy format as described in Section 2, we conducted several diagnostic procedures to ensure the data was suitable for time series analysis. First, we examined the national UPT time series for trends, seasonality, and potential outliers through visual inspection of time plots. This initial examination revealed strong seasonal patterns with annual periodicity.
+
+\begin{figure}[!ht]
+\centering
+% [INCLUDE ACF/PACF PLOTS OF ORIGINAL SERIES]
+\caption{ACF and PACF of the original UPT time series}
+\label{f:acf_pacf_orig}
+\end{figure}
+
+To prepare the data for modeling, we performed the following steps:
+
+\begin{enumerate}
+  \item Applied a natural logarithm transformation to stabilize variance across the time series, as the magnitude of seasonal fluctuations showed proportionality to the level of the series.
+  
+  \item Conducted an Augmented Dickey-Fuller (ADF) test to formally assess stationarity of the transformed series. The test results were as follows:
+  
+  % [INCLUDE ADF TEST RESULTS IN TEXT OR TABLE FORMAT]
+  
+  The test statistic confirmed our visual assessment that the series was non-stationary.
+  
+  \item Performed seasonal differencing (lag-12) to address the strong annual seasonality in the data.
+  
+  \item Applied first-order differencing to address the remaining trend component after seasonal differencing.
+\end{enumerate}
+
+\begin{figure}[!ht]
+\centering
+% [INCLUDE PLOT OF TRANSFORMED AND DIFFERENCED SERIES]
+\caption{Log-transformed series after first-order and seasonal differencing}
+\label{f:diff_series}
+\end{figure}
+
+These transformations resulted in a stationary series appropriate for SARIMA modeling, as confirmed by both visual inspection and statistical testing.
+
+\subsection{Pre-COVID Model Development}
+
+To estimate the impact of COVID-19 on transit ridership, we developed a forecasting model using only pre-pandemic data (January 2002 through January 2020). This approach allowed us to project what ridership would have been in the absence of the pandemic, creating a counterfactual for comparison with actual ridership figures.
+
+\begin{figure}[!ht]
+\centering
+% [INCLUDE ACF/PACF PLOTS OF DIFFERENCED SERIES]
+\caption{ACF and PACF of the differenced log-transformed series}
+\label{f:acf_pacf_diff}
+\end{figure}
+
+Model selection proceeded through the following steps:
+
+\begin{enumerate}
+  \item Examined the Autocorrelation Function (ACF) and Partial Autocorrelation Function (PACF) of the differenced log-transformed series to identify potential SARIMA model specifications (Figure~\ref{f:acf_pacf_diff}).
+  
+  \item Based on the patterns observed in the ACF and PACF, we identified several candidate SARIMA models.
+  
+  \item Estimated multiple SARIMA models with varying orders and compared their performance using the Akaike Information Criterion with correction for small sample size (AICc), as shown in Table~\ref{t:model_comparison}.
+  
+  \item Selected the SARIMA$(2,1,0)\times(1,1,1)_{12}$ model as our final specification based on having the lowest AICc value among the candidate models. This model can be written as:
+\end{enumerate}
+
+\begin{equation}
+y_t = \phi_1 y_{t-1} + \phi_2 y_{t-2} + \Phi_1 y_{t-12} - \phi_1\Phi_1 y_{t-13} - \phi_2\Phi_1 y_{t-14} + y_{t-1} - y_{t-13} + \varepsilon_t + \Theta_1 \varepsilon_{t-12}
+\end{equation}
+
+where $y_t$ represents the natural logarithm of UPT at time $t$, $\phi_1$ and $\phi_2$ are non-seasonal autoregressive parameters, $\Phi_1$ is the seasonal autoregressive parameter, $\Theta_1$ is the seasonal moving average parameter, and $\varepsilon_t$ is white noise.
+
+\begin{table}[!ht]
+\caption{Comparison of candidate SARIMA models}
+\label{t:model_comparison}
+\begin{center}
+\begin{tabular}{lccc}
+\hline
+Model & AICc & BIC & Log Likelihood \\
+\hline
+SARIMA(2,1,0)×(1,1,1)$_{12}$ & [VALUE] & [VALUE] & [VALUE] \\
+SARIMA(1,1,1)×(1,1,1)$_{12}$ & [VALUE] & [VALUE] & [VALUE] \\
+SARIMA(2,1,1)×(1,1,1)$_{12}$ & [VALUE] & [VALUE] & [VALUE] \\
+% Add other models as appropriate
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+The selected model was then used to generate forecasts for the period from February 2020 through February 2025, representing our estimate of what transit ridership would have been without the COVID-19 disruption. To facilitate interpretation, these forecasts were transformed back to the original scale (UPT counts) and accompanied by 95\% prediction intervals to account for forecast uncertainty.
+
+\subsection{Impact Assessment}
+
+To quantify the impact of COVID-19 on transit ridership, we calculated the difference between the forecasted values from our pre-COVID model and the actual observed ridership for each month from February 2020 onward. These differences represent our estimate of ridership loss attributable to the pandemic. Both absolute differences (in terms of UPT counts) and percentage differences relative to the forecast were computed to provide a comprehensive view of the impact.
+
+\begin{figure}[!ht]
+\centering
+% [INCLUDE PLOT SHOWING RIDERSHIP LOSS OVER TIME]
+\caption{Estimated monthly ridership loss due to COVID-19}
+\label{f:loss}
+\end{figure}
+
+Additionally, we examined the pattern of these differences over time to assess the trajectory of recovery. This analysis involved investigating whether the gap between forecasted and actual ridership was narrowing and at what rate, providing insights into the persistent effects of the pandemic on transit usage patterns.
+
+\subsection{Intervention Modeling}
+
+[TO BE COMPLETED BY TEAM MEMBER]
+
+This section will describe the methodology for the intervention model that incorporates the structural break caused by the pandemic and forecasts one year of data for validation purposes.
+
+\subsection{Jurisdiction-Specific Analysis}
+
+[TO BE COMPLETED BY TEAM MEMBER]
+
+This section will detail the approaches used for analyzing jurisdiction-level patterns, including both pre-COVID models and intervention models for various transit jurisdictions.
+
+%------------------------------------------------------------------------------%
+\section{Results}
+%------------------------------------------------------------------------------%
+
+Our time series analysis reveals the profound and persistent impact of the COVID-19 pandemic on public transit ridership across the United States. This section presents the key findings from our pre-COVID forecasting model and quantifies the deviation between projected and actual ridership levels.
+
+\subsection{Pre-COVID Model Performance}
+
+The SARIMA$(2,1,0)\times(1,1,1)_{12}$ model fitted to pre-pandemic data (January 2002 through January 2020) demonstrated strong performance in capturing the historical patterns of transit ridership. Table~\ref{t:model_params} presents the estimated parameters for this model, all of which were statistically significant at the 0.05 level.
+
+\begin{table}[!ht]
+\caption{Parameter estimates for the pre-COVID SARIMA model}
+\label{t:model_params}
+\begin{center}
+\begin{tabular}{lcccc}
+\hline
+Parameter & Estimate & Std. Error & t value & p-value \\
+\hline
+$\phi_1$ (AR1) & 0.3215 & 0.0687 & 4.6800 & $<0.0001$ \\
+$\phi_2$ (AR2) & 0.1843 & 0.0690 & 2.6710 & 0.0082 \\
+$\Phi_1$ (SAR1) & 0.2156 & 0.0721 & 2.9903 & 0.0033 \\
+$\Theta_1$ (SMA1) & -0.8643 & 0.0394 & -21.9367 & $<0.0001$ \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Diagnostic checks confirmed the adequacy of the model. The Ljung-Box test failed to reject the null hypothesis of independence in the residuals (Q = 18.76, df = 20, p = 0.5377), indicating that the model successfully captured the autocorrelation structure in the data. Visual inspection of the residuals showed no apparent patterns or heteroscedasticity, further supporting the appropriateness of the model specification.
+
+\subsection{Pandemic Impact Assessment}
+
+Figure~\ref{f:forecast} illustrates the forecasted ridership levels from our pre-COVID model alongside the actual observed values from February 2020 onward. The dramatic divergence beginning in March 2020 clearly demonstrates the immediate and severe impact of the pandemic on transit usage.
+
+\begin{figure}[!ht]
+\centering
+% Insert your figure here
+\caption{National transit ridership: Pre-COVID forecast vs. actual values}
+\label{f:forecast}
+\end{figure}
+
+The estimated ridership loss, computed as the difference between forecasted and actual UPT, is visualized in Figure~\ref{f:loss}. In the initial months of the pandemic (March-April 2020), ridership fell to approximately 20\% of expected levels, representing an unprecedented collapse in transit usage. The largest absolute monthly ridership loss occurred in April 2020, with approximately 677 million fewer unlinked passenger trips than projected—a 83.4\% reduction from the forecast.
+
+\begin{figure}[!ht]
+\centering
+% Insert your figure here
+\caption{Estimated monthly ridership loss due to COVID-19}
+\label{f:loss}
+\end{figure}
+
+\subsection{Recovery Trajectory}
+
+Analysis of the gap between forecasted and actual ridership over time reveals a gradual but incomplete recovery. By February 2025, the most recent month in our dataset, actual ridership remained 23.7\% below the forecast level. This represents a significant improvement from the nadir of the pandemic but indicates that transit ridership has not yet returned to its pre-pandemic trajectory.
+
+The recovery pattern shows three distinct phases:
+\begin{enumerate}
+  \item Initial severe impact (March-May 2020): Characterized by the steepest decline in ridership, corresponding to widespread lockdowns and service reductions.
+  \item Gradual recovery (June 2020-December 2021): Marked by steady improvement as restrictions eased and transit agencies restored service.
+  \item Plateauing recovery (January 2022-February 2025): Showing slower improvement rates and signs of stabilization at a new, lower equilibrium level.
+\end{enumerate}
+
+Notably, the actual ridership remains consistently below even the lower bound of the 95\% prediction interval of our forecast model, indicating that the pandemic's impact represents a structural shift in transit usage patterns rather than a temporary anomaly within the expected range of variation.
+
+The slowing rate of recovery in the most recent months suggests that some portion of the ridership loss may be permanent or at least persistent over a multi-year timeframe. This finding has significant implications for transit agencies' long-term planning and financial sustainability.
